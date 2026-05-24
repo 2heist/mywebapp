@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  db:
+    image: mariadb:10.11
+    environment:
+      MARIADB_ROOT_PASSWORD: root_password
+      MARIADB_DATABASE: mywebapp
+      MARIADB_USER: app
+      MARIADB_PASSWORD: password
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - custom_lab_network
+
+  web:
+    build: .
+    command: node app.js --dbhost=db --port=5200
+    depends_on:
+      - db
+    networks:
+      - custom_lab_network
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - web
+    networks:
+      - custom_lab_network
+
+volumes:
+  db_data:
+
+networks:
+  custom_lab_network:
+    driver: bridge
