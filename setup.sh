@@ -1,3 +1,4 @@
+#!/bin/bash
 echo "Починаємо встановлення пакетів..."
 apt update
 apt install -y nodejs npm mariadb-server nginx git curl
@@ -30,7 +31,7 @@ mysql -e "FLUSH PRIVILEGES;"
 echo "Розміщення файлів застосунку..."
 mkdir -p /opt/mywebapp
 cp app.js migrate.js package.json /opt/mywebapp/
-cd /opt/mywebapp
+cd /opt/mywebapp || exit 1
 npm install express minimist mariadb@2
 chown -R app:app /opt/mywebapp
 
