@@ -1,0 +1,41 @@
+---
+- name: Встановлення PostgreSQL та залежностей
+  apt:
+    name:
+      - postgresql
+      - postgresql-contrib
+      - python3-psycopg2
+      - acl
+    state: present
+    update_cache: yes
+
+- name: Створення бази даних appdb
+  postgresql_db:
+    name: appdb
+  become_user: postgres
+
+- name: Створення користувача БД appuser
+  postgresql_user:
+    db: appdb
+    name: appuser
+    password: apppassword
+  become_user: postgres
+
+- name: Налаштування postgresql.conf (слухати всі інтерфейси)
+  lineinfile:
+    path: /etc/postgresql/14/main/postgresql.conf
+    regexp: '^#?listen_addresses\s*='
+    line: "listen_addresses = '*'"
+  notify: restart postgresql
+
+- name: Налаштування pg_hba.conf (доступ тільки для worker)
+  lineinfile:
+    path: /etc/postgresql/14/main/pg_hba.conf
+    line: "host    appdb           appuser         {{ hostvars['worker']['ansible_host'] }}/32      md5"
+  notify: restart postgresql
+
+- name: Перезапуск PostgreSQL
+  systemd:
+    name: postgresql
+    state: restarted
+

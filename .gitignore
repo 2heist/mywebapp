@@ -1,0 +1,6 @@
+cat <<EOT >> .gitignore
+lab4/terraform/.terraform/
+lab4/terraform/*.tfstate
+lab4/terraform/*.tfstate.backup
+lab4/terraform/.terraform.lock.hcl
+EOT

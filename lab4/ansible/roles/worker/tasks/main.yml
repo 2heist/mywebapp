@@ -1,0 +1,72 @@
+---
+- name: Встановлення Nginx та Node.js
+  apt:
+    name:
+      - nginx
+      - nodejs
+      - npm
+    state: present
+    update_cache: yes
+
+- name: Створення системного користувача app
+  user:
+    name: app
+    system: yes
+    shell: /usr/sbin/nologin
+
+- name: Створення користувача operator
+  user:
+    name: operator
+    password: "{{ '12345678' | password_hash('sha512') }}"
+    shell: /bin/bash
+
+- name: Налаштування sudo прав для operator
+  copy:
+    dest: /etc/sudoers.d/operator
+    content: |
+      operator ALL=(ALL) NOPASSWD: /bin/systemctl start app, /bin/systemctl stop app, /bin/systemctl restart app, /bin/systemctl status app, /bin/systemctl reload nginx
+    mode: '0440'
+
+- name: Створення директорії застосунку
+  file:
+    path: /opt/app
+    state: directory
+    owner: app
+    group: app
+
+- name: Встановлення пакета pg для Node.js
+  npm:
+    name: pg
+    path: /opt/app
+
+- name: Копіювання коду застосунку
+  template:
+    src: server.js.j2
+    dest: /opt/app/server.js
+    owner: app
+    mode: '0644'
+  notify: restart app
+
+- name: Налаштування systemd сервісу для app
+  template:
+    src: app.service.j2
+    dest: /etc/systemd/system/app.service
+  notify: restart app
+
+- name: Запуск та автозапуск застосунку
+  systemd:
+    name: app
+    enabled: yes
+    state: started
+    daemon_reload: yes
+
+- name: Налаштування Nginx (reverse proxy)
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/sites-available/default
+  notify: restart nginx
+
+- name: Перезапуск Nginx
+  systemd:
+    name: nginx
+    state: restarted
