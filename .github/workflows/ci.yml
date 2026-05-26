@@ -89,3 +89,19 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  deploy:
+    name: Deploy to Target Node
+    needs: build
+    runs-on: self-hosted
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Execute deployment script via SSH
+        run: |
+          scp -o StrictHostKeyChecking=no mywebapp.service deploy.sh edward@192.168.50.96:/tmp/
+          
+          ssh -o StrictHostKeyChecking=no edward@192.168.50.96 "cd /tmp && chmod +x deploy.sh && ./deploy.sh"
