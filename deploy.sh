@@ -20,7 +20,7 @@ sudo systemctl restart mywebapp.service
 echo "Verifying deployment..."
 sleep 5 
 
-if curl -sSf http://127.0.0.1:5200 > /dev/null; then
+if curl -sSf http://127.0.0.1:5299 > /dev/null; then
     echo "Verification SUCCESS: Application is running and responding!"
     exit 0
 else
