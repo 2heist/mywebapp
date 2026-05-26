@@ -96,9 +96,10 @@ app.post('/notes', async (req, res) => {
     } catch (err) { res.status(500).send(err.message); }
 });
 
-// КЛЮЧОВА ЗМІНА ДЛЯ SOCKET ACTIVATION
 if (process.env.LISTEN_FDS > 0) {
     app.listen({ fd: 3 }, () => console.log('Server is running via Socket Activation (fd: 3)'));
 } else {
     app.listen(PORT, '0.0.0.0', () => console.log(`Server is running on 127.0.0.1:${PORT}`));
 }
+
+module.exports = app;
