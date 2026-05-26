@@ -7,3 +7,5 @@ RUN npm install
 COPY . .
 
 EXPOSE 5200
+
+CMD ["node", "app.js", "--port=5200", "--dbuser=app", "--dbpassword=password", "--dbname=mywebapp"]
