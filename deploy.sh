@@ -24,7 +24,7 @@ if curl -sSf http://127.0.0.1:5200 > /dev/null; then
     echo "Verification SUCCESS: Application is running and responding!"
     exit 0
 else
-    echo "Verification FAILED: Application crashed or not responding on port 5200!"
+    echo "Verification FAILED: Application crashed or not responding on port 5299!"
     exit 1
 fi
 
