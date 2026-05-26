@@ -17,4 +17,14 @@ echo "Starting Docker container service..."
 sudo systemctl enable mywebapp.service
 sudo systemctl restart mywebapp.service
 
-echo "Deployment finished successfully!"
+echo "Verifying deployment..."
+sleep 5 
+
+if curl -sSf http://127.0.0.1:5200 > /dev/null; then
+    echo "Verification SUCCESS: Application is running and responding!"
+    exit 0
+else
+    echo "Verification FAILED: Application crashed or not responding on port 5200!"
+    exit 1
+fi
+
