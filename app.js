@@ -1,3 +1,6 @@
+const iAmBroken = "This will fail the linting process";
+
+
 const express = require('express');
 const mariadb = require('mariadb');
 const minimist = require('minimist');
