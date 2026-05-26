@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "Починаємо встановлення пакетів..."
 apt update
-apt install -y nodejs npm mariadb-server nginx git curl
+apt install -y nodejs npm mariadb-server nginx git curl docker.io
 
 echo "Створення користувачів..."
 useradd -m -s /bin/bash -G sudo student 2>/dev/null || true

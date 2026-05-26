@@ -1,0 +1,14 @@
+[Unit]
+Description=My Node.js Web Application Container
+After=docker.service mariadb.service
+Requires=docker.service
+
+[Service]
+Restart=always
+ExecStartPre=-/usr/bin/docker stop mywebapp-container
+ExecStartPre=-/usr/bin/docker rm mywebapp-container
+ExecStart=/usr/bin/docker run --name mywebapp-container --network host ghcr.io/2heist/mywebapp:latest
+ExecStop=/usr/bin/docker stop mywebapp-container
+
+[Install]
+WantedBy=multi-user.target
