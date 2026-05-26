@@ -5,7 +5,7 @@ on:
     branches:
       - main
     tags:
-      - '*' 
+      - '*'
   pull_request:
     branches:
       - main
@@ -24,10 +24,10 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Run ESLint
-        run: npm run lint 
+        run: npm run lint
 
       - name: Lint Dockerfile with Hadolint
         uses: hadolint/hadolint-action@v3.1.0
@@ -36,7 +36,12 @@ jobs:
 
       - name: Lint shell scripts with Shellcheck
         run: |
-          find . -type f -name "*.sh" -exec shellcheck {} +
+          if [ -n "$(find . -type f -name '*.sh')" ]; then
+            find . -type f -name "*.sh" -exec shellcheck {} +
+          else
+            echo "No shell scripts found to lint."
+          fi
+
       - name: Run Tests & Coverage
         run: npm run test
 
@@ -47,13 +52,13 @@ jobs:
           name: coverage-report
           path: coverage/
 
-build:
+  build:
     name: Build and Push Docker Image
     needs: lint
     runs-on: ubuntu-24.04
     permissions:
       contents: read
-      packages: write 
+      packages: write
 
     steps:
       - name: Checkout code
@@ -64,7 +69,7 @@ build:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }} 
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
@@ -72,10 +77,8 @@ build:
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
-            # Теги для комітів у main
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
             type=sha,format=long,enable=${{ github.ref == 'refs/heads/main' }}
-            # Теги для анотованих тегів
             type=raw,value=stable,enable=${{ startsWith(github.ref, 'refs/tags/') }}
             type=ref,event=tag
 
